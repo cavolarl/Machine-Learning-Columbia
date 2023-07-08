@@ -1,6 +1,5 @@
 import scipy as sp
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.stats import multivariate_normal
 
 data = sp.io.loadmat('HW1/digits.mat')
