@@ -1,8 +1,7 @@
 import scipy as sp
 import numpy as np
 import matplotlib.pyplot as plt
-
-# NOTE: This code is really bad, and I'm not proud of it. I'm just trying to get it to work.
+from scipy.stats import multivariate_normal
 
 data = sp.io.loadmat('HW1/digits.mat')
 
@@ -12,16 +11,14 @@ data = list(zip(data['X'], data['Y']))
 
 # We separate the data into training and testing sets
 
-train_data = data[:5000]
-test_data = data[5000:]
+# Function to separate the data into training and testing sets
+def split_data(data, train_size):
+    train_data = data[:train_size]
+    test_data = data[train_size:]
+    return train_data, test_data
 
-print(train_data[0][0], train_data[0][1])
-
-print(train_data[0])
-
-# The value in data[0][0] is the image data, and the value in data[0][1] is the label
-
-# I'm going to create a dictionary of lists, where the key is the label and the value is a list of all the images with that label
+# Split the data into training and testing sets
+train_data, test_data = split_data(data, 5000)
 
 data_dict = {}
 
@@ -32,15 +29,10 @@ for i in range(len(train_data)):
     label = int(train_data[i][1][0])  # Extract the single value from the array and convert to int
     data_dict[label].append(train_data[i][0])
 
-# print an example of the data for each label
-for i in range(10):
-    print("Label: ", i)
-    print(data_dict[i][0])
-
-# Now we need to calculate the mean and covariance matrix for each label
-
 mean_dict = {}
 cov_dict = {}
+
+# NOTE: Better algorithm to calculate the covariance matrix is needed
 
 for label, images in data_dict.items():
     # convert the list of images into a 2D numpy array
@@ -54,15 +46,6 @@ for label, images in data_dict.items():
     mean_dict[label] = mean
     cov_dict[label] = cov
 
-# print an example of the mean and covariance for each label
-for i in range(10):
-    print("Label: ", i)
-    print("Mean: ", mean_dict[i])
-    print("Covariance: ", cov_dict[i])
-
-from scipy.stats import multivariate_normal
-
-# Initialize a dictionary to store the distributions
 # NOTE: We added a small value to the diagonal of the covariance matrix to ensure that it is positive definite
 distributions = {}
 regularization_value = 1e-3
