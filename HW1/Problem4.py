@@ -1,38 +1,106 @@
 import scipy as sp
 import numpy as np
+import matplotlib.pyplot as plt
+
+# NOTE: This code is really bad, and I'm not proud of it. I'm just trying to get it to work.
 
 data = sp.io.loadmat('HW1/digits.mat')
 
-# Our data consists of 10000 28x28 images of handwritten digits
+# I'm going to create tuples of (x,y) to more easily access the labels
 
-# X is a 10000x784 matrix where each row is a represetentation of the handwritten digits
-# Y is a 10000x1 matrix of the labels for each image
+data = list(zip(data['X'], data['Y']))
 
-X = data['X']
-Y = data['Y']
+# We separate the data into training and testing sets
 
-# We will use the first 8000 images as our training set and the last 2000 as our test set
+train_data = data[:5000]
+test_data = data[5000:]
 
-X_train = X[:8000]
-Y_train = Y[:8000]
+print(train_data[0][0], train_data[0][1])
 
-X_test = X[8000:]
-Y_test = Y[8000:]
+print(train_data[0])
 
-# We create tuples of (image, label) for each image in our training set
-# NOTE: I don't know if we need tuples but we proceed like this for now
+# The value in data[0][0] is the image data, and the value in data[0][1] is the label
 
-training_set = [(X_train[i], Y_train[i]) for i in range(len(X_train))]
-test_set = [(X_test[i], Y_test[i]) for i in range(len(X_test))]
+# I'm going to create a dictionary of lists, where the key is the label and the value is a list of all the images with that label
 
-# NOTE: We are going to create two different classifiers, one using a MLE to evaluate the density function, the other using kNN
-# We will then compare the two classifiers to see which one performs better
+data_dict = {}
 
-# Using MLE to evaluate the density function
-# TODO: Implement this
+for i in range(10):
+    data_dict[i] = []
 
-# Using kNN
-# TODO: Implement this
+for i in range(len(train_data)):
+    label = int(train_data[i][1][0])  # Extract the single value from the array and convert to int
+    data_dict[label].append(train_data[i][0])
 
-# TODO: Compare the two classifiers
+# print an example of the data for each label
+for i in range(10):
+    print("Label: ", i)
+    print(data_dict[i][0])
+
+# Now we need to calculate the mean and covariance matrix for each label
+
+mean_dict = {}
+cov_dict = {}
+
+for label, images in data_dict.items():
+    # convert the list of images into a 2D numpy array
+    images_array = np.array(images)
+    
+    # calculate the mean and covariance
+    mean = np.mean(images_array, axis=0)
+    cov = np.cov(images_array, rowvar=False)
+
+    # store the mean and covariance in dictionaries
+    mean_dict[label] = mean
+    cov_dict[label] = cov
+
+# print an example of the mean and covariance for each label
+for i in range(10):
+    print("Label: ", i)
+    print("Mean: ", mean_dict[i])
+    print("Covariance: ", cov_dict[i])
+
+from scipy.stats import multivariate_normal
+
+# Initialize a dictionary to store the distributions
+# NOTE: We added a small value to the diagonal of the covariance matrix to ensure that it is positive definite
+distributions = {}
+regularization_value = 1e-3
+
+for label in data_dict.keys():
+    # Create a covariance matrix for this label, adding a small value to the diagonal
+    cov = cov_dict[label] + regularization_value * np.eye(cov_dict[label].shape[0])
+    
+    # Create a distribution for this label
+    distributions[label] = multivariate_normal(mean=mean_dict[label], cov=cov)
+
+
+def classify_image(image, distributions):
+    # Initialize a dictionary to store the likelihoods
+    likelihoods = {}
+
+    for label, distribution in distributions.items():
+        # Compute the likelihood of the image under this distribution
+        likelihoods[label] = distribution.logpdf(image)
+
+    # Return the label with the highest likelihood
+    return max(likelihoods, key=likelihoods.get)
+
+# Convert labels in test_data from numpy arrays to integers
+test_data = [(image, int(label[0])) for image, label in test_data]
+
+predicted_labels = []
+true_labels = [label for image, label in test_data]
+# Loop over the test data
+for image, true_label in test_data:
+    # Classify the image
+    predicted_label = classify_image(image, distributions)
+    
+    # Store the predicted label
+    predicted_labels.append(predicted_label)
+
+# Calculate the accuracy by comparing the predicted labels to the true labels
+accuracy = sum(predicted_label == true_label for predicted_label, true_label in zip(predicted_labels, true_labels)) / len(test_data)
+
+print("The classification accuracy is: ", accuracy)
 
