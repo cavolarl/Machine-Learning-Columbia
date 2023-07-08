@@ -4,12 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import multivariate_normal
 
 data = sp.io.loadmat('HW1/digits.mat')
-
-# I'm going to create tuples of (x,y) to more easily access the labels
-
 data = list(zip(data['X'], data['Y']))
-
-# We separate the data into training and testing sets
 
 # Function to separate the data into training and testing sets
 def split_data(data, train_size):
@@ -19,7 +14,6 @@ def split_data(data, train_size):
 
 # Split the data into training and testing sets
 train_data, test_data = split_data(data, 5000)
-
 data_dict = {}
 
 for i in range(10):
@@ -86,4 +80,3 @@ for image, true_label in test_data:
 accuracy = sum(predicted_label == true_label for predicted_label, true_label in zip(predicted_labels, true_labels)) / len(test_data)
 
 print("The classification accuracy is: ", accuracy)
-
