@@ -27,8 +27,6 @@ for i in range(len(train_data)):
 mean_dict = {}
 cov_dict = {}
 
-# NOTE: Better algorithm to calculate the covariance matrix is needed
-
 for label, images in data_dict.items():
     # convert the list of images into a 2D numpy array
     images_array = np.array(images)

@@ -46,10 +46,7 @@ class KNN:
         most_common = Counter(k_nearest_labels).most_common(1)
         return most_common[0][0]
 
-# TODO: Implement a better way of dealing with parameters
-
-
-knn = KNN(k=5)
+knn = KNN(k=3)
 knn.fit(X_train, y_train)
 predictions = knn.predict(X_test)
 
