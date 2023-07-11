@@ -47,7 +47,7 @@ for label in data_dict.keys():
     # Create a covariance matrix for this label, adding a small value to the diagonal
     cov = cov_dict[label] + regularization_value * np.eye(cov_dict[label].shape[0])
     
-    # Create a distribution for this label
+    # Create a distribution for this label using a multivariate normal(gaussian distribution)
     distributions[label] = multivariate_normal(mean=mean_dict[label], cov=cov)
 
 
