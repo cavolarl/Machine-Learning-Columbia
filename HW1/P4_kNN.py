@@ -1,56 +1,60 @@
-import scipy as sp
 import numpy as np
 from collections import Counter
+import scipy as sp
 
+# Load the data
 data = sp.io.loadmat('digits.mat')
-data = list(zip(data['X'], data['Y']))
+X = data['X']
+Y = data['Y'].flatten()
 
-# Function to separate the data into training and testing sets
-def split_data(data, train_size):
-    train_data = data[:train_size]
-    test_data = data[train_size:]
-    return train_data, test_data
+# Split the data into training and test sets
+X_train = X[:8000]
+y_train = Y[:8000]
+X_test = X[8000:]
+y_test = Y[8000:]
 
-# Split the data into training and testing sets
-train_data, test_data = split_data(data, 5000)
+X_train = X_train / 255
+X_test = X_test / 255
 
-# Separate the images and labels in the training and testing sets
-X_train = np.array([x[0] for x in train_data])
-y_train = np.array([x[1][0] for x in train_data])  # get the label from each tuple and unwrap it from its array
-X_test = np.array([x[0] for x in test_data])
-y_test = np.array([x[1][0] for x in test_data])  # get the label from each tuple and unwrap it from its array
+# NOTE: Rewrite distance function to manually compute Euclidean distance
+# Using reshape to convert 1D array to 2D array
+# Using flatten to convert 2D array to 1D array
+def euclidean_distance(x1, X):
+    return np.sqrt(np.sum((x1 - X)**2, axis=1))
 
-def distance(x, X):
-    return np.sqrt(np.sum((x - X)**2, axis=1))
 
 
 class KNN:
     def __init__(self, k):
         self.k = k
 
-    def fit(self, X, Y):
+    def fit(self, X, y):
         self.X_train = X
-        self.y_train = Y
+        self.y_train = y
 
     def predict(self, X):
-        predicted_labels = [self.compute_kNN(x) for x in X]
-        return np.array(predicted_labels)
+        predicted_labels = np.empty(X.shape[0])
+        # Loop over all observations
+        for i, observation in enumerate(X):
+            predicted_labels[i] = self._predict(observation)
+        return predicted_labels
 
-    def compute_kNN(self, x):
-        # Compute distances between x and all examples in the training set
-        distances = distance(self.X_train, x)
-        # Sort by distance and return indices of the first k neighbors
-        k_indices = np.argsort(distances)[:self.k]
-        # Extract the labels of the k nearest neighbor training samples
-        k_nearest_labels = [int(self.y_train[i]) for i in k_indices]
-        # Return the most common class label
+    def _predict(self, x):
+        # NOTE: Using scipy gives an accuracy of 0.955, and using the manual gives an accuracy of 0.232
+        # Compute Euclidean distances
+        #distances = sp.spatial.distance.cdist(self.X_train, x.reshape(1,-1), 'euclidean').flatten()
+        distances = euclidean_distance(x, self.X_train)
+        # Get indices of k nearest neighbours
+        k_indices = distances.argsort()[:self.k]
+        # Get the labels of the k nearest neighbours
+        k_nearest_labels = self.y_train[k_indices]
+        # Return the most common label
         most_common = Counter(k_nearest_labels).most_common(1)
         return most_common[0][0]
 
+# Test the model
 knn = KNN(k=3)
 knn.fit(X_train, y_train)
 predictions = knn.predict(X_test)
-#print(f"Predictions: {predictions} and Actual: {y_test}")
-# To compute accuracy
-accuracy = np.sum(predictions == y_test) / len(y_test)
+accuracy = np.mean(predictions == y_test)
 print("The classification accuracy is: ", accuracy)
