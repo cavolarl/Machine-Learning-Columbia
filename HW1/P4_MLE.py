@@ -11,13 +11,18 @@ data = sp.io.loadmat('digits.mat')
 X = data['X'] / 255   # Normalize the features
 y = data['Y'].flatten()
 
-# Split the data into training and test sets
-# Im using a split of 70/30, I found it to work pretty well.
-split_ratio = 0.7
-split_index = int(split_ratio * X.shape[0])
-X_train, y_train = X[:split_index], y[:split_index]
-X_test, y_test = X[split_index:], y[split_index:]
-
+# Split data, also randomizes the data
+def split_data(X, y, split_ratio):
+    # Generate a permutation of the indices
+    indices = np.random.permutation(X.shape[0])
+    split_index = int(split_ratio * X.shape[0])
+    train_indices, test_indices = indices[:split_index], indices[split_index:]
+    X_train, y_train = X[train_indices], y[train_indices]
+    X_test, y_test = X[test_indices], y[test_indices]
+    return X_train, y_train, X_test, y_test
+# Change this parameter to change the split ratio
+split_ratio = 0.1
+X_train, y_train, X_test, y_test = split_data(X, y, split_ratio)
 
 # This is our definition of a multivariate normal distribution
 class MultivariateNormal:
@@ -62,4 +67,4 @@ for image in X_test:
 
 # Calculate the accuracy
 accuracy = np.mean(predictions == y_test)
-print(f"The classification accuracy is: {accuracy}")
+print(f"The classification accuracy at a split ratio of: {split_ratio} is: {accuracy}")
