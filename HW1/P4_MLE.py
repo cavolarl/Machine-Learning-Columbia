@@ -1,20 +1,43 @@
 import scipy as sp
 import numpy as np
-from scipy.stats import multivariate_normal
 
-data = sp.io.loadmat('HW1/digits.mat')
+data = sp.io.loadmat('digits.mat')
 data = list(zip(data['X'], data['Y']))
+
+# Define a multivariate normal distribution
+class MultivariateNormal:
+    def __init__(self, mean, cov):
+        self.mean = mean
+        self.cov = cov
+        self.inv_cov = np.linalg.inv(self.cov)
+        self.det_cov = np.linalg.det(self.cov)
+        self.dim = len(mean)
+        
+    def pdf(self, x):
+        """
+        Calculate the Probability Density Function at data point x
+        """
+        x_m = x - self.mean
+        return (1. / (np.sqrt((2 * np.pi)**self.dim * self.det_cov)) *
+                np.exp(-(np.linalg.solve(self.cov, x_m).T.dot(x_m)) / 2))
+
+    def logpdf(self, x):
+        """
+        Calculate the log Probability Density Function at data point x
+        """
+        x_m = x - self.mean
+        return (-0.5 * self.dim * np.log(2 * np.pi) - 0.5 * np.log(self.det_cov) -
+                0.5 * x_m.T.dot(self.inv_cov).dot(x_m))
+
 
 # Function to separate the data into training and testing sets
 def split_data(data, train_size):
-    # We shuffle the data to eliminate the possibility of the data being ordered
-    np.shuffle(data)
     train_data = data[:train_size]
     test_data = data[train_size:]
     return train_data, test_data
 
 # Split the data into training and testing sets
-train_data, test_data = split_data(data, 8000)
+train_data, test_data = split_data(data, 7000)
 data_dict = {}
 
 for i in range(10):
@@ -42,13 +65,11 @@ for label, images in data_dict.items():
 # NOTE: We added a small value to the diagonal of the covariance matrix to ensure that it is positive definite
 distributions = {}
 regularization_value = 1e-3
-
 for label in data_dict.keys():
-    # Create a covariance matrix for this label, adding a small value to the diagonal
-    cov = cov_dict[label] + regularization_value * np.eye(cov_dict[label].shape[0])
-    
+    # Create a covariance matrix for this label
+    cov = cov_dict[label] + np.eye(cov_dict[label].shape[0]) * regularization_value
     # Create a distribution for this label using a multivariate normal(gaussian distribution)
-    distributions[label] = multivariate_normal(mean=mean_dict[label], cov=cov)
+    distributions[label] = MultivariateNormal(mean=mean_dict[label], cov=cov)
 
 
 def classify_image(image, distributions):
