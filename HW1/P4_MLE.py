@@ -21,7 +21,8 @@ def split_data(X, y, split_ratio):
     X_test, y_test = X[test_indices], y[test_indices]
     return X_train, y_train, X_test, y_test
 # Change this parameter to change the split ratio
-split_ratio = 0.1
+# NOTE: Testing at very low values requires some luck since missing labels are not handled
+split_ratio = 0.7
 X_train, y_train, X_test, y_test = split_data(X, y, split_ratio)
 
 # This is our definition of a multivariate normal distribution
@@ -34,10 +35,6 @@ class MultivariateNormal:
         self.inv_cov = np.linalg.inv(self.cov)
         # Using this slogdet, improves the stability of the calculation
         self.log_det_cov = np.linalg.slogdet(self.cov)[1]
-    # probability density function
-    def pdf(self, x):
-        x_m = x - self.mean
-        return np.exp(-0.5 * (x_m @ self.inv_cov @ x_m)) / np.sqrt((2 * np.pi) ** self.dim * np.exp(self.log_det_cov))
     # log probability density function
     def logpdf(self, x):
         x_m = x - self.mean

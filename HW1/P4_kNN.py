@@ -27,10 +27,17 @@ def split_data(X, y, split_ratio):
 def euclidean_distance(x1, X):
     return np.sqrt(np.sum((x1 - X)**2, axis=1))
 
+def manhattan_distance(x1, X):
+    return np.sum(np.abs(x1 - X), axis=1)
+
+def chebyshev_distance(x1, X):
+    return np.max(np.abs(x1 - X), axis=1)
+
 # This class contains the functions of the knn algorithm
 class KNN:
-    def __init__(self, k):
+    def __init__(self, k, L):
         self.k = k
+        self.distance_function = L
 
     def fit(self, X, y):
         self.X_train = X
@@ -44,7 +51,7 @@ class KNN:
         return predicted_labels
 
     def predict(self, x):
-        distances = euclidean_distance(x, self.X_train)
+        distances = self.distance_function(x, self.X_train)
         # sort distance and get the k nearest neighbours
         k_indices = distances.argsort()[:self.k]
         # Get the labels of those k nearest neighbours
@@ -53,11 +60,14 @@ class KNN:
         most_common = Counter(k_nearest_labels).most_common(1)
         return most_common[0][0]
 
-# Test the model
-split_ratio = 0.01
+# Test the model, beware of very low values, they can cause missing labels
+split_ratio = 0.7
+# Write the distance function you want to use here
+distance_function = manhattan_distance
 X_train, y_train, X_test, y_test = split_data(X, y, split_ratio)
-knn = KNN(k=3)
+# Change k if you want it to be different
+knn = KNN(k=1, L=distance_function)
 knn.fit(X_train, y_train)
 predictions = knn.predict_labels(X_test)
 accuracy = np.mean(predictions == y_test)
-print(f"The classification accuracy at a split ratio of: {split_ratio} is: {accuracy}")
+print(f"The classification accuracy with distance function {str(distance_function)} at a split ratio of: {split_ratio} is: {accuracy}")
