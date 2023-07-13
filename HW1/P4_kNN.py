@@ -5,6 +5,7 @@ import scipy as sp
 # Load the data
 data = sp.io.loadmat('digits.mat')
 X = data['X']
+# Convert Y from 2D to 1D
 Y = data['Y'].flatten()
 
 # Split the data into training and test sets
@@ -13,15 +14,14 @@ y_train = Y[:8000]
 X_test = X[8000:]
 y_test = Y[8000:]
 
+# Normalize the data, (this improved the accuracy by 70%)
 X_train = X_train / 255
 X_test = X_test / 255
 
-# NOTE: Rewrite distance function to manually compute Euclidean distance
-# Using reshape to convert 1D array to 2D array
-# Using flatten to convert 2D array to 1D array
+# This is our euclidean distance function
+# axis = 1 means we want to sum over the rows
 def euclidean_distance(x1, X):
     return np.sqrt(np.sum((x1 - X)**2, axis=1))
-
 
 
 class KNN:
@@ -40,15 +40,12 @@ class KNN:
         return predicted_labels
 
     def _predict(self, x):
-        # NOTE: Using scipy gives an accuracy of 0.955, and using the manual gives an accuracy of 0.232
-        # Compute Euclidean distances
-        #distances = sp.spatial.distance.cdist(self.X_train, x.reshape(1,-1), 'euclidean').flatten()
         distances = euclidean_distance(x, self.X_train)
-        # Get indices of k nearest neighbours
+        # sort distance and get the k nearest neighbours
         k_indices = distances.argsort()[:self.k]
-        # Get the labels of the k nearest neighbours
+        # Get the labels of those k nearest neighbours
         k_nearest_labels = self.y_train[k_indices]
-        # Return the most common label
+        # Return the most common label among them
         most_common = Counter(k_nearest_labels).most_common(1)
         return most_common[0][0]
 
