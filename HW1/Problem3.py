@@ -1,5 +1,6 @@
 import numpy as np
 
+# Our gradient descent function
 def gradient_descent(f, compute_gradient, x_0, eta, max_iter=1000, tol=1e-6):
     x = x_0
     for _ in range(max_iter):
@@ -9,3 +10,18 @@ def gradient_descent(f, compute_gradient, x_0, eta, max_iter=1000, tol=1e-6):
             break
         x = x_next
     return x
+
+# Here we define the function f(x)
+def f(x):
+    return (x-4)**2+2*np.exp(x)
+
+# Here we define the gradient of f(x)
+def compute_gradient(x):
+    return 2*(x-4)+2*np.exp(x)
+
+# Lets run our gradient descent algorithm
+x_0 = 0
+eta = 0.1
+x_min = gradient_descent(f, compute_gradient, x_0, eta)
+print("The minimum of f(x) is: ", x_min)
+print("The value of f(x) at the minimum is: ", f(x_min))
