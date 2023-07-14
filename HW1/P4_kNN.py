@@ -63,10 +63,10 @@ class KNN:
 # Test the model, beware of very low values, they can cause missing labels
 split_ratio = 0.7
 # Write the distance function you want to use here
-distance_function = manhattan_distance
+distance_function = chebyshev_distance
 X_train, y_train, X_test, y_test = split_data(X, y, split_ratio)
 # Change k if you want it to be different
-knn = KNN(k=1, L=distance_function)
+knn = KNN(k=7, L=distance_function)
 knn.fit(X_train, y_train)
 predictions = knn.predict_labels(X_test)
 accuracy = np.mean(predictions == y_test)
