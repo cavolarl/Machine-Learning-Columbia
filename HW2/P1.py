@@ -49,11 +49,9 @@ def train_perceptron(X_train, y_train, T):
         i = np.argmin(y_train * np.dot(w, X_train.T))
         x_i = X_train[i]
         y_i = y_train[i]
-        
-        # Now use w from the previous iteration (or same iteration if condition is not met)
+
         if y_i * np.dot(w, x_i) <= 0:
             w = w + y_i * x_i
-        # No need for else, since w remains the same if the condition is not met
     return w
 
 # Create a weight matrix to store weight vectors for each class
@@ -62,13 +60,11 @@ weights = np.zeros((num_classes, X_train.shape[1]))
 
 # Train a perceptron for each class
 for c in range(num_classes):
-    y_train_c = np.where(y_train == c, 1, -1)  # Adjust labels for current class
-    weights[c] = train_perceptron(X_train, y_train_c, n*10)  # Assuming 10 passes over the dataset for each perceptron
+    y_train_c = np.where(y_train == c, 1, -1)
+    weights[c] = train_perceptron(X_train, y_train_c, n*5)
 
 def predict(x):
-    # Compute scores for each class
     scores = np.dot(weights, x)
-    # Return class with highest score
     return np.argmax(scores)
 
 # Evaluate on test set
