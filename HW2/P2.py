@@ -23,6 +23,7 @@ def split_data(X, y, split_ratio):
 
 # Split the data
 X_train, y_train, X_test, y_test = split_data(X, y, 0.7)
+n, d = X_train.shape  # n = number of examples, d = number of features
 
 # Perceptron V2
 # w_1 = 0, c_0 = 0, k = 1
@@ -38,46 +39,51 @@ X_train, y_train, X_test, y_test = split_data(X, y, 0.7)
 # Classifier
 # f(x) = sign(sum_{i=1}^k c_i*sign(w_i * x))
 
-n, d = X_train.shape  # n = number of examples, d = number of features
-w = np.zeros(d)
-c = [0]
-k = 0
-T = n * 10  # Assuming 10 passes over the dataset
+def train_perceptron(X_train, y_train, T):
+    w = np.zeros(d)
+    w_list = [w]
+    c = [0]
+    k = 0
 
-for t in range(T):
-    i = t % n
-    x_i = X_train[i]
-    y_i = y_train[i]
-    if y_i * np.dot(w, x_i) <= 0:
-        w = w + y_i * x_i
-        c.append(1)
-        k += 1
-    else:
-        c[k] += 1
+    for t in range(T):
+        i = t % n
+        x_i = X_train[i]
+        y_i = y_train[i]
+        if y_i * np.dot(w, x_i) <= 0:
+            w = w + y_i * x_i
+            w_list.append(w)
+            c.append(1)
+            k += 1
+        else:
+            c[k] += 1
+
+    return w_list, c
+
+num_classes = 10
+weights = []
+counts = []
+
+for c in range(num_classes):
+    y_train_c = np.where(y_train == c, 1, -1)
+    w_list_c, c_list_c = train_perceptron(X_train, y_train_c, n*5)
+    weights.append(w_list_c)
+    counts.append(c_list_c)
+    print(f"Trained perceptron for class {c}")
 
 
+def predict(x, w_list, c_list):
+    score = sum(c_list[i] * np.sign(np.dot(w_list[i], x)) for i in range(len(w_list)))
+    return score
 
-def sign(val):
-    return np.sign(val)
+def predict_all(X_test):
+    scores = []
+    for x in X_test:
+        class_scores = [predict(x, weights[c], counts[c]) for c in range(num_classes)]
+        scores.append(class_scores)
+    return np.argmax(scores, axis=1)
 
-def f(x):
-    summation = 0
-    for i in range(k+1):  # Remember that indexing starts from 0
-        summation += c[i] * sign(np.dot(w, x))
-    return sign(summation)
-
-def test_classifier(X_test, y_test):
-    correct_predictions = 0
-    total_predictions = len(y_test)
-    
-    for i in range(total_predictions):
-        prediction = f(X_test[i])
-        if prediction == y_test[i]:
-            correct_predictions += 1
-
-    accuracy = correct_predictions / total_predictions
-    return accuracy
-
-accuracy = test_classifier(X_test, y_test)
+# Evaluate on test set
+predictions = predict_all(X_test)
+accuracy = np.mean(predictions == y_test)
 print(f"Accuracy: {accuracy*100:.2f}%")
 
