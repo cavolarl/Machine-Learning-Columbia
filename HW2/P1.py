@@ -21,6 +21,10 @@ def split_data(X, y, split_ratio):
     X_test, y_test = X[test_indices], y[test_indices]
     return X_train, y_train, X_test, y_test
 
+# Split the data
+X_train, y_train, X_test, y_test = split_data(X, y, 0.7)
+n, d = X_train.shape
+
 # Perceptron V1
 
 # Initialize w_0 = 0
@@ -34,3 +38,40 @@ def split_data(X, y, split_ratio):
 
 # Classifier
 # f(x) = sign(w_T * x)
+
+import numpy as np
+
+def train_perceptron(X_train, y_train, T):
+    w = np.zeros(d)
+    
+    for t in range(T):
+        # pick example (x_i,y_i) such that i = arg min_j (y_j * w_t-1 * x_j)
+        i = np.argmin(y_train * np.dot(w, X_train.T))
+        x_i = X_train[i]
+        y_i = y_train[i]
+        
+        # Now use w from the previous iteration (or same iteration if condition is not met)
+        if y_i * np.dot(w, x_i) <= 0:
+            w = w + y_i * x_i
+        # No need for else, since w remains the same if the condition is not met
+    return w
+
+# Create a weight matrix to store weight vectors for each class
+num_classes = 10
+weights = np.zeros((num_classes, X_train.shape[1]))
+
+# Train a perceptron for each class
+for c in range(num_classes):
+    y_train_c = np.where(y_train == c, 1, -1)  # Adjust labels for current class
+    weights[c] = train_perceptron(X_train, y_train_c, n*10)  # Assuming 10 passes over the dataset for each perceptron
+
+def predict(x):
+    # Compute scores for each class
+    scores = np.dot(weights, x)
+    # Return class with highest score
+    return np.argmax(scores)
+
+# Evaluate on test set
+predictions = np.array([predict(x) for x in X_test])
+accuracy = np.mean(predictions == y_test)
+print(f"Accuracy: {accuracy*100:.2f}%")
