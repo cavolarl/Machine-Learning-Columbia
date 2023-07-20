@@ -35,7 +35,7 @@ def split_data(X, y, split_ratio):
 # Sign(w_T dot x)
 
 # Split the data
-X_train, y_train, X_test, y_test = split_data(X, y, 0.7)
+X_train, y_train, X_test, y_test = split_data(X, y, 0.01)
 n, d = X_train.shape
 
 def train_perceptron(X_train, y_train, T):
@@ -55,7 +55,7 @@ weights = np.zeros((num_classes, X_train.shape[1]))
 # Train a perceptron for each class
 for c in range(num_classes):
     y_train_c = np.where(y_train == c, 1, -1)  # Adjust labels for current class
-    weights[c] = train_perceptron(X_train, y_train_c, n*10)  # Assuming 10 passes over the dataset for each perceptron
+    weights[c] = train_perceptron(X_train, y_train_c, n*5)  # Assuming 10 passes over the dataset for each perceptron
 
 def predict(x):
     # Compute scores for each class

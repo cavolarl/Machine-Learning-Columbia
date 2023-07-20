@@ -22,7 +22,7 @@ def split_data(X, y, split_ratio):
     return X_train, y_train, X_test, y_test
 
 # Split the data
-X_train, y_train, X_test, y_test = split_data(X, y, 0.7)
+X_train, y_train, X_test, y_test = split_data(X, y, 0.01)
 n, d = X_train.shape  # n = number of examples, d = number of features
 
 # Perceptron V2
@@ -68,7 +68,6 @@ for c in range(num_classes):
     w_list_c, c_list_c = train_perceptron(X_train, y_train_c, n*5)
     weights.append(w_list_c)
     counts.append(c_list_c)
-    print(f"Trained perceptron for class {c}")
 
 
 def predict(x, w_list, c_list):

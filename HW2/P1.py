@@ -22,7 +22,7 @@ def split_data(X, y, split_ratio):
     return X_train, y_train, X_test, y_test
 
 # Split the data
-X_train, y_train, X_test, y_test = split_data(X, y, 0.7)
+X_train, y_train, X_test, y_test = split_data(X, y, 0.01)
 n, d = X_train.shape
 
 # Perceptron V1
