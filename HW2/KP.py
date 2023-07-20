@@ -23,3 +23,12 @@ def split_data(X, y, split_ratio):
 
 
 # Kernel Perceptron
+
+#Algorithm:
+#Initialize = 0
+#For t = 1,2,3,…, T
+#If exists s.t.
+#implicitly working in
+#non-linear kernel space!
+
+
