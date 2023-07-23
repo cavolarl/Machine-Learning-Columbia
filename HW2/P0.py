@@ -34,7 +34,7 @@ def split_data(X, y, split_ratio):
 # Classifier
 # Sign(w_T dot x)
 
-# Split the data
+# NOTE: Set data split here
 X_train, y_train, X_test, y_test = split_data(X, y, 0.01)
 n, d = X_train.shape
 
@@ -53,6 +53,7 @@ num_classes = 10
 weights = np.zeros((num_classes, X_train.shape[1]))
 
 # Train a perceptron for each class
+# NOTE: Parameters can be set here
 for c in range(num_classes):
     y_train_c = np.where(y_train == c, 1, -1)  # Adjust labels for current class
     weights[c] = train_perceptron(X_train, y_train_c, n*5)  # Assuming 10 passes over the dataset for each perceptron

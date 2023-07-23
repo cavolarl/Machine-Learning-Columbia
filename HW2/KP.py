@@ -19,15 +19,15 @@ def split_data(X, y, split_ratio):
     X_test, y_test = X[test_indices], y[test_indices]
     return X_train, y_train, X_test, y_test
 
-# Split the data
-X_train, y_train, X_test, y_test = split_data(X, y, 0.5)
+# NOTE: Set data split here
+X_train, y_train, X_test, y_test = split_data(X, y, 0.7)
 
-def polynomial_kernel(x_i, x_j, d=10, c=2):
+# NOTE: Set the kernel function here
+def polynomial_kernel(x_i, x_j, d=20, c=5):
     return (c + np.dot(x_i, x_j)) ** d
 
-
-# Precompute the kernel matrix
-def compute_kernel_matrix(X, d=10, c=2):
+# NOTE: Also set the kernel function here
+def compute_kernel_matrix(X, d=20, c=5):
     K = np.dot(X, X.T)
     K = (c + K) ** d
     return K
@@ -58,10 +58,10 @@ def predict_kernel_perceptron(K_test_point, alphas, y_train):
 num_classes = 10
 alphas = np.zeros((num_classes, X_train.shape[0]))
 
-# Train a kernel perceptron for each class
 for c in range(num_classes):
     y_train_c = np.where(y_train == c, 1, -1)
-    alphas[c] = train_kernel_perceptron(K_train, y_train_c, len(y_train)*20)
+    # NOTE: Set n here
+    alphas[c] = train_kernel_perceptron(K_train, y_train_c, len(y_train)*30)
     print(f"Trained kernel perceptron for class {c}")
 
 # Evaluate on test set
@@ -70,12 +70,6 @@ for x in X_test:
     K_test_point = polynomial_kernel(X_train, x)
     predictions.append(predict_kernel_perceptron(K_test_point, alphas, y_train))
 predictions = np.array(predictions)
-
-# print the distribution of the predictions
-print(np.bincount(predictions))
-print(np.bincount(y_test))
-
-
 
 accuracy = np.mean(predictions == y_test)
 print(f"Accuracy: {accuracy*100:.2f}%")

@@ -22,6 +22,7 @@ def split_data(X, y, split_ratio):
     return X_train, y_train, X_test, y_test
 
 # Split the data
+# NOTE: Set data split here
 X_train, y_train, X_test, y_test = split_data(X, y, 0.01)
 n, d = X_train.shape  # n = number of examples, d = number of features
 
@@ -63,6 +64,7 @@ num_classes = 10
 weights = []
 counts = []
 
+# NOTE: Parameters can be set here
 for c in range(num_classes):
     y_train_c = np.where(y_train == c, 1, -1)
     w_list_c, c_list_c = train_perceptron(X_train, y_train_c, n*5)
