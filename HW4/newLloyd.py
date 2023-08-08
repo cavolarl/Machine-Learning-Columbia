@@ -3,7 +3,7 @@ from scipy.spatial import distance
 from scipy.sparse.linalg import eigs
 import matplotlib.pyplot as plt
 
-from datasets import ConcentricCirclesDataset, SparseDataset, SpiralDataset
+from datasets import ConcentricCirclesDataset, SparseDataset, ChainOfCirclesDataset
 
 def constructEdgeMatrix(data, r):
     n = len(data)
@@ -65,12 +65,12 @@ def transformativeClustering(data, r, k):
 
 
 # Create a dataset instance, update this to use the dataset you want to test
-dataset = SpiralDataset()
+dataset = ChainOfCirclesDataset()
 dataPoints = dataset.points
 
 # Set parameters
-numNeighbors = 2
-numClusters = 2
+numNeighbors = 5
+numClusters = 5
 
 labels = transformativeClustering(dataPoints, numNeighbors, numClusters)
 

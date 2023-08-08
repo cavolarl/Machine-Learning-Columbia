@@ -1,11 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from lloyd import lloyd
-from datasets import SpiralDataset
-# from spiral_dataset import SpiralDataset  # Uncomment to use the spiral dataset
+from datasets import ChainOfCirclesDataset
 
 # Create a dataset instance
-data = SpiralDataset()
+data = ChainOfCirclesDataset()
 # data = SpiralDataset()  # Uncomment to use the spiral dataset
 
 points = data.points

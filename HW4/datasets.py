@@ -55,22 +55,40 @@ class SparseDataset:
 
         return points
 
-class SpiralDataset:
-    def __init__(self, nPoints=800, noise=0.05):
-        self.nPoints = nPoints
+class ChainOfCirclesDataset:
+    def __init__(self, nCircles=5, pointsPerCircle=100, noise=0.05, radiusMultiplier=2):
+        self.nCircles = nCircles
+        self.pointsPerCircle = pointsPerCircle
         self.noise = noise
+        self.radiusMultiplier = radiusMultiplier
         self.points = self.generate()
-        self.name = "Spiral Dataset"
+        self.name = "Chain of Circles Dataset"
 
     def generate(self):
-        points = np.zeros((self.nPoints, 2))
+        points = np.zeros((self.nCircles * self.pointsPerCircle, 2))
         
-        # Generate points in a spiral pattern
-        t = np.linspace(0, 4 * np.pi, self.nPoints)  # t parameter
-        x = t * np.cos(t) + np.random.normal(0, self.noise, self.nPoints)  # x coordinates
-        y = t * np.sin(t) + np.random.normal(0, self.noise, self.nPoints)  # y coordinates
+        # Starting center of the circle chain
+        center_x, center_y = 0, 0
+        current_radius = self.radiusMultiplier  # Initial circle radius
+        
+        for i in range(self.nCircles):
+            # Generate angles between 0 and 2π for the current circle
+            angles = np.linspace(0, 2 * np.pi, self.pointsPerCircle)
+            
+            # Generate the points on the circle
+            x = current_radius * np.cos(angles) + np.random.normal(0, self.noise, self.pointsPerCircle) + center_x
+            y = current_radius * np.sin(angles) + np.random.normal(0, self.noise, self.pointsPerCircle) + center_y
 
-        points[:, 0] = x
-        points[:, 1] = y
+            # Store the points in the dataset
+            points[i * self.pointsPerCircle : (i + 1) * self.pointsPerCircle, 0] = x
+            points[i * self.pointsPerCircle : (i + 1) * self.pointsPerCircle, 1] = y
+            
+            # Update the center for the next circle. Since we want a chain, we'll set the new center at the end of the current circle
+            angle_for_next_center = angles[-1]
+            center_x = x[-1] + (current_radius + current_radius * self.radiusMultiplier) * np.cos(angle_for_next_center)
+            center_y = y[-1] + (current_radius + current_radius * self.radiusMultiplier) * np.sin(angle_for_next_center)
+            
+            # Update the radius for the next circle
+            current_radius *= self.radiusMultiplier
 
         return points
