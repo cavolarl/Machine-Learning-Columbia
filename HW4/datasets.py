@@ -55,14 +55,14 @@ class SparseDataset:
 
         return points
 
-class ChainOfCirclesDataset:
+class ChainDataset:
     def __init__(self, nCircles=5, pointsPerCircle=100, noise=0.05, radiusMultiplier=2):
         self.nCircles = nCircles
         self.pointsPerCircle = pointsPerCircle
         self.noise = noise
         self.radiusMultiplier = radiusMultiplier
         self.points = self.generate()
-        self.name = "Chain of Circles Dataset"
+        self.name = "Chain Dataset"
 
     def generate(self):
         points = np.zeros((self.nCircles * self.pointsPerCircle, 2))

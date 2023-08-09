@@ -2,22 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from lloyd import lloyd
 from datasets import SparseDataset
-# from spiral_dataset import SpiralDataset  # Uncomment to use the spiral dataset
 
-# Create a dataset instance
 data = SparseDataset()
-# data = SpiralDataset()  # Uncomment to use the spiral dataset
 
 points = data.points
 
-# Determine the bounds of the dataset for better initialization of centers
+# Determine the bounds of the dataset for better initialization
 x_min, x_max = points[:, 0].min() - 1, points[:, 0].max() + 1
 y_min, y_max = points[:, 1].min() - 1, points[:, 1].max() + 1
 
-# Initialize 4 centers randomly within the bounds
+# Then initialize n centers randomly within the bounds, then run lloyds
 centers = np.array([[np.random.uniform(x_min, x_max), np.random.uniform(y_min, y_max)] for _ in range(4)])
-
-
 assignment, centers = lloyd(points, centers)
 
 # Visualize the points and their clusters

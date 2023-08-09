@@ -3,7 +3,7 @@ from scipy.spatial import distance
 from scipy.sparse.linalg import eigs
 import matplotlib.pyplot as plt
 
-from datasets import ConcentricCirclesDataset, SparseDataset, ChainOfCirclesDataset
+from datasets import ConcentricCirclesDataset, SparseDataset, ChainDataset
 
 def constructEdgeMatrix(data, r):
     n = len(data)
@@ -24,6 +24,7 @@ def bottomKEigenvectors(L, k):
     vals, vecs = eigs(L, k=k, which="SM")
     return vecs
 
+# This is inspired by the GeeksforGeeks page on kmeans++ initialization
 def kmeansPlusPlusInit(data, k):
     centers = [data[np.random.randint(data.shape[0])]]
     for _ in range(1, k):
@@ -65,11 +66,11 @@ def transformativeClustering(data, r, k):
 
 
 # Create a dataset instance, update this to use the dataset you want to test
-dataset = ChainOfCirclesDataset()
+dataset = ChainDataset()
 dataPoints = dataset.points
 
 # Set parameters
-numNeighbors = 5
+numNeighbors = 10
 numClusters = 5
 
 labels = transformativeClustering(dataPoints, numNeighbors, numClusters)
